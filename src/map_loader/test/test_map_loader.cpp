@@ -30,11 +30,19 @@ TEST_F(TestMapLoader, LoadValidPCDEmitsOctomap) {
     cloud.width = 5;
     cloud.height = 1;
     cloud.points.resize(5);
-    cloud.points[0] = pcl::PointXYZI(0.f, 0.f, 0.f, 1.f);
-    cloud.points[1] = pcl::PointXYZI(1.f, 0.f, 0.f, 1.f);
-    cloud.points[2] = pcl::PointXYZI(0.f, 1.f, 0.f, 1.f);
-    cloud.points[3] = pcl::PointXYZI(0.f, 0.f, 1.f, 1.f);
-    cloud.points[4] = pcl::PointXYZI(2.f, 2.f, 0.5f, 1.f);
+    // PCL 1.10 has no (x, y, z, intensity) constructor for PointXYZI,
+    // so fill the fields explicitly to stay version-agnostic.
+    auto set_point = [&cloud](std::size_t i, float x, float y, float z, float intensity) {
+      cloud.points[i].x = x;
+      cloud.points[i].y = y;
+      cloud.points[i].z = z;
+      cloud.points[i].intensity = intensity;
+    };
+    set_point(0, 0.f, 0.f, 0.f, 1.f);
+    set_point(1, 1.f, 0.f, 0.f, 1.f);
+    set_point(2, 0.f, 1.f, 0.f, 1.f);
+    set_point(3, 0.f, 0.f, 1.f, 1.f);
+    set_point(4, 2.f, 2.f, 0.5f, 1.f);
     pcl::io::savePCDFile(pcd_path, cloud);
   }
 

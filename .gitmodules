@@ -1,0 +1,3 @@
+[submodule "GazeboQuadbot"]
+	path = GazeboQuadbot
+	url = git@github.com:blow-prelude/GazeboQuadbot.git

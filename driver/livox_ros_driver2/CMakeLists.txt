@@ -282,7 +282,10 @@ else(ROS_EDITION STREQUAL "ROS2")
   target_include_directories(${PROJECT_NAME} PRIVATE ${livox_sdk_INCLUDE_DIRS})
 
   # get include directories of custom msg headers
-  if(HUMBLE_ROS STREQUAL "humble")
+  # Humble and newer provide rosidl_get_typesupport_target; fall back to the
+  # legacy target-property lookup only when it is unavailable, so that a plain
+  # `colcon build` (without -DHUMBLE_ROS=humble) still configures correctly.
+  if(HUMBLE_ROS STREQUAL "humble" OR COMMAND rosidl_get_typesupport_target)
     rosidl_get_typesupport_target(cpp_typesupport_target
     ${LIVOX_INTERFACES} "rosidl_typesupport_cpp")
     target_link_libraries(${PROJECT_NAME} "${cpp_typesupport_target}")
