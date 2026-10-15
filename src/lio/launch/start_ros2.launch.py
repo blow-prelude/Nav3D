@@ -31,15 +31,17 @@ def generate_launch_description():
     return LaunchDescription([
         DeclareLaunchArgument("config_path", default_value="root_config.yaml"),
         DeclareLaunchArgument("use_rviz", default_value="true"),
-        # Gazebo 仿真 / bag 回放需设为 true，使节点与 RViz 使用 /clock 时域
+        # 仅作用于 rviz（显示时钟）。lio 节点保持墙钟节奏：
+        # 其流水线完全由消息时间戳驱动，定时器只负责推进 FSM；
+        # 若也绑到 /clock（Gazebo 常见只有 ~10Hz），FSM 消费 IMU 的速率会被
+        # 压到时钟频率量级，建图掉到 ~1Hz 且永远追不上仿真时间。
         DeclareLaunchArgument("use_sim_time", default_value="false"),
         Node(
             package="lio",
             executable="lio",
             name="lio_node",
             output="screen",
-            parameters=[{"config_path": config_path},
-                        {"use_sim_time": use_sim_time}],
+            parameters=[{"config_path": config_path}],
             remappings=MAPPING_REMAPS,
         ),
         Node(

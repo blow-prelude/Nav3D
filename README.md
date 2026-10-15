@@ -121,7 +121,7 @@ ros2 launch lio start_ros2.launch.py config_path:=root_config_sim.yaml use_sim_t
   - `imu_t_lidar = (-0.011, -0.02329, 0.04412)`(mid360 内置 IMU)
   - `lidar_R_body = R_y(-0.4)`, `lidar_t_body = (-0.1796, 0, -0.2171)`(对应 URDF 安装 `xyz 0.25 0 0.13, rpy 0 0.4 0`)
 - `yaml/runtime/mapping_sim.yaml`:`global_map_pub_enable: true`(RViz 可视化全局地图)
-- `use_sim_time:=true`:仿真消息使用 Gazebo /clock 时域,RViz 端 TF 显示需要
+- `use_sim_time:=true`:仅作用于 RViz(仿真 TF 时间域)；lio 节点流水线由消息时间戳驱动，保持墙钟节奏
 
 ### 4. 驱动狗运动 + 建图
 
