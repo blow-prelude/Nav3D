@@ -11,6 +11,17 @@ Visualization Manager:
       Enabled: true
       Cell Size: 1
       Plane: XY
+    - Class: rviz_default_plugins/RobotModel
+      Name: RobotModel
+      Enabled: true
+      Description Source: Topic
+      Description Topic:
+        Value: /robot_description
+      TF Prefix: ""
+      Update Interval: 0
+      Alpha: 1
+      Show Robot Visual: true
+      Show Robot Collision: false
     - Class: rviz_default_plugins/PointCloud2
       Name: LiDAR
       Enabled: true
