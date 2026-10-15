@@ -10,7 +10,7 @@
 
 局部规划`Nav3D/src/local_planner`（clone https://github.com/wuyi2121/SCAN-Planner.git）
 
-仿真基座直接使用`/media/lenovo/disk/Embodied_AI/GazeboQuadbot`
+仿真基座直接使用`/home/ww/program/projects/go2w_outdoor_3d/GazeboQuadbot`
 
 驱动:Mid360驱动使用官方的[`livox_ros_driver2`](https://github.com/Livox-SDK/livox_ros_driver2.git)
 
@@ -80,10 +80,10 @@ git clone git@github.com:VisionTrekker/Nav3D.git
 sudo apt-get install -y ros-humble-gazebo-ros-pkgs ros-humble-robot-localization ros-humble-gazebo-ros2-control
 
 # 本工作区 build
-cd /media/lenovo/disk/planner_ws
+cd /home/ww/program/projects/go2w_outdoor_3d/Nav3D
 source /opt/ros/humble/setup.zsh
 rosdep install --from-paths src --ignore-src -r -y
-colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release -DHUMBLE_ROS=humble
+colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release -DHUMBLE_ROS=humble
 source install/setup.zsh
 ```
 
@@ -94,7 +94,7 @@ source install/setup.zsh
 ```bash
 # 终端 1: 启动 Gazebo 仿真 (Go2W + mid360 + bigHHH 室内场景)
 source /opt/ros/humble/setup.zsh
-source /media/lenovo/disk/Embodied_AI/GazeboQuadbot/install/setup.zsh
+source /home/ww/program/projects/go2w_outdoor_3d/GazeboQuadbot/install/setup.zsh
 ros2 launch go2w_config go2w_lidar_gps.launch.py
 ```
 
@@ -108,29 +108,30 @@ ros2 launch go2w_config go2w_lidar_gps.launch.py
 
 ```bash
 # 终端 2: 启动 LIO mapping 模式 (消费 /livox/*, 累积 ikd-tree 地图)
-cd /media/lenovo/disk/planner_ws
+cd /home/ww/program/projects/go2w_outdoor_3d/Nav3D
 source install/setup.zsh
-source /media/lenovo/disk/Embodied_AI/GazeboQuadbot/install/setup.zsh
-ros2 launch lio start_ros2.launch.py config_path:=root_config_sim.yaml
+source /home/ww/program/projects/go2w_outdoor_3d/GazeboQuadbot/install/setup.zsh
+ros2 launch lio start_ros2.launch.py config_path:=root_config_sim.yaml use_sim_time:=true
 ```
 
 关键配置：
 
-- `yaml/sensors/mid360_sim.yaml`:仿真专用外参(需按 GazeboQuadbot URDF 标定)
-  - `lidar_type: 2`(PointCloud2 输入,非真实 Livox CustomMsg)
+- `yaml/sensors/mid360_sim.yaml`:仿真专用传感器配置(外参已按 GazeboQuadbot URDF 标定)
+  - `lidar_type: 2`(PointCloud2 输入,非真实 Livox CustomMsg;仿真插件发布的是标准 PointCloud2)
   - `imu_t_lidar = (-0.011, -0.02329, 0.04412)`(mid360 内置 IMU)
-  - `lidar_R_body = R_y(0.4)`, `lidar_t_body = (-0.2806, 0, -0.0224)`(mid360 安装:body 前 0.25m 上 0.13m,绕 y 倾斜 0.4 rad)
-- `yaml/runtime/mapping.yaml`:`global_map_pub_enable: true`(RViz 可视化全局地图)
+  - `lidar_R_body = R_y(-0.4)`, `lidar_t_body = (-0.1796, 0, -0.2171)`(对应 URDF 安装 `xyz 0.25 0 0.13, rpy 0 0.4 0`)
+- `yaml/runtime/mapping_sim.yaml`:`global_map_pub_enable: true`(RViz 可视化全局地图)
+- `use_sim_time:=true`:仿真消息使用 Gazebo /clock 时域,RViz 端 TF 显示需要
 
 ### 4. 驱动狗运动 + 建图
 
 ```bash
 # 终端 3: teleop 控制狗走动 (按 i=前进, j/l=转向, k=停)
 source /opt/ros/humble/setup.zsh
-source /media/lenovo/disk/Embodied_AI/GazeboQuadbot/install/setup.zsh
+source /home/ww/program/projects/go2w_outdoor_3d/GazeboQuadbot/install/setup.zsh
 ros2 run teleop_twist_keyboard teleop_twist_keyboard
 ```
 
-- **RViz 订阅** `/nav3d/lio/global_map` 查看实时建图
+- **RViz 订阅** `/lio/mapping/global_map` 查看实时建图
 - **RViz 订阅** `/lio_node/path_topic_name` 查看定位轨迹
 - 驱动狗走遍场景所有房间/走廊,LIO 实时累积地图

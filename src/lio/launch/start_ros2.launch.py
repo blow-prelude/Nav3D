@@ -26,16 +26,20 @@ def generate_launch_description():
     package_share = FindPackageShare("lio")
     config_path = LaunchConfiguration("config_path")
     use_rviz = LaunchConfiguration("use_rviz")
+    use_sim_time = LaunchConfiguration("use_sim_time")
 
     return LaunchDescription([
         DeclareLaunchArgument("config_path", default_value="root_config.yaml"),
         DeclareLaunchArgument("use_rviz", default_value="true"),
+        # Gazebo 仿真 / bag 回放需设为 true，使节点与 RViz 使用 /clock 时域
+        DeclareLaunchArgument("use_sim_time", default_value="false"),
         Node(
             package="lio",
             executable="lio",
             name="lio_node",
             output="screen",
-            parameters=[{"config_path": config_path}],
+            parameters=[{"config_path": config_path},
+                        {"use_sim_time": use_sim_time}],
             remappings=MAPPING_REMAPS,
         ),
         Node(
@@ -44,6 +48,7 @@ def generate_launch_description():
             name="rviz2",
             output="screen",
             arguments=["-d", PathJoinSubstitution([package_share, "rviz", "LIO_ros2.rviz"])],
+            parameters=[{"use_sim_time": use_sim_time}],
             condition=IfCondition(use_rviz),
         ),
     ])

@@ -1,0 +1,28 @@
+# GazeboQuadbot 仿真专用传感器配置（Gazebo mid360 插件，PointCloud2 输入）
+#
+# 外参来源（robot_scene/xacro/go2w_description.urdf.xacro）：
+#   <xacro:mid360 name="livox" parent="body">
+#       <origin xyz="0.25 0 0.13" rpy="0 0.4 0"/>
+#   </xacro:mid360>
+#   - imu_t_lidar = livox_imu joint 平移取反（mid360 内置 IMU）
+#   - lidar_R_body = R_y(-0.4)（安装角 R_y(0.4) 的逆），lidar_t_body = -R·(0.25, 0, 0.13)
+
+lidar_type: 2 # PointCloud2 输入（仿真插件非 Livox CustomMsg），走通用 pc2 解析路径
+
+offset:
+  imu_t_lidar: [ -0.011 , -0.02329, 0.04412] # IMU系下激光雷达的位置
+  imu_R_lidar:
+    - [1.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0]
+    - [0.0, 0.0, 1.0]
+  lidar_t_body: [ -0.1796, 0, -0.2171] # Lidar系下小车中心的位置
+  lidar_R_body: # Lidar系下小车的旋转
+    - [0.9211, 0.0, -0.3894]
+    - [0.0, 1.0, 0.0]
+    - [0.3894, 0.0, 0.9211]
+
+topic_sub:
+  lidar_topic_name: "/livox/lidar"
+  imu_topic_name: "/livox/imu"
+  wheel_topic_name: "/wheel_info" # 仿真未发布；wheel_enable: false 时不参与
+  elevator_flag_topic_name: "/LIO/set_elevator_flag"

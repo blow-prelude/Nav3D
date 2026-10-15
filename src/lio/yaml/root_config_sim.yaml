@@ -1,0 +1,7 @@
+# Gazebo 仿真（GazeboQuadbot go2w + mid360 插件）专用根配置。
+# 启动：ros2 launch lio start_ros2.launch.py config_path:=root_config_sim.yaml use_sim_time:=true
+# 路径相对于此 yaml/ 目录。三个文件不得包含重复的键；
+
+sensor_config: "sensors/mid360_sim.yaml"    # 仿真 mid360：PointCloud2 输入 + 仿真安装外参
+runtime_config: "runtime/mapping_sim.yaml"  # 建图模式；开启 global_map_pub_enable 供 RViz 查看实时建图
+logging_config: "logging/default.yaml"      # 日志配置：控制台/文件日志开关、可视化选项
